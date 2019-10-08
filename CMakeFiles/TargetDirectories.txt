@@ -1,3 +1,0 @@
-/home/ben/Documents/code_projects/cpp/compressor/CMakeFiles/rebuild_cache.dir
-/home/ben/Documents/code_projects/cpp/compressor/CMakeFiles/cmprssr.dir
-/home/ben/Documents/code_projects/cpp/compressor/CMakeFiles/edit_cache.dir

@@ -1,8 +1,8 @@
-./Makefile
-./cmprssr
-./test.cmp
-./test.txt
-./test.dcmp
-./CMakeFiles
-./CMakeCache.txt
-./cmake_install.cmake
+Makefile
+cmprssr
+test.cmp
+test.txt
+test.dcmp
+CMakeFiles/**
+CMakeCache.txt
+cmake_install.cmake
