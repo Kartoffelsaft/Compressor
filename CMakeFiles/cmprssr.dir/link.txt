@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/cmprssr.dir/src/main.cpp.o CMakeFiles/cmprssr.dir/src/fileReader.cpp.o  -o cmprssr 
