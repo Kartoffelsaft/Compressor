@@ -67,13 +67,13 @@ void decompress(std::string const file)
             decompress<unsigned char>(data);
             break;
         case 2:
-            decompress<unsigned short>(data);
+            decompress<uint16_t>(data);
             break;
         case 3:
-            decompress<unsigned int>(data);
+            decompress<uint32_t>(data);
             break;
         case 4:
-            decompress<unsigned long>(data);
+            decompress<uint64_t>(data);
             break;
     }
 }
@@ -142,17 +142,17 @@ int main(int argc, char** argv)
                 compress<unsigned char>(file, chunkSize);
                 break;
             case 16:
-                compress<unsigned short>(file, chunkSize);
+                compress<uint16_t>(file, chunkSize);
                 break;
             case 32:
-                compress<unsigned int>(file, chunkSize);
+                compress<uint32_t>(file, chunkSize);
                 break;
             case 64:
-                compress<unsigned long>(file, chunkSize);
+                compress<uint64_t>(file, chunkSize);
                 break;
 
             default:
-                printf("A chunk size of %u is invalid. valid numbers are: 8, 16, 32, 64\n", chunkSize);
+                printf("A chunk size of %i is invalid. valid numbers are: 8, 16, 32, 64\n", chunkSize);
                 return 2;
         }
     }
