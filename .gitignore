@@ -1,6 +1,7 @@
 Makefile
 cmprssr
 test.cmp
+test.png
 test.txt
 test.dcmp
 CMakeFiles/**

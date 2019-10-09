@@ -1,6 +1,6 @@
 # What is this?
 
-This is my file compressor. It compresses files. It is hot garbage, but I also think it is the best thing I have created so far because it can have a practical use.
+This is my file compressor. It compresses files. It is hot garbage, but I also think it is the best thing I have created so far because it can have a practical use. please don't use it practically though.
 
 # How to use
 
@@ -10,11 +10,14 @@ This is my file compressor. It compresses files. It is hot garbage, but I also t
  *  ``` -d ```:
     Specify the file to decompress.
 
+ *  ``` -o ```:
+    Specify the file to output to. Default is test.cmp for compressing and test.dcmp for decompressing.
+
  *  ``` -C ```:
     Specify chunk size in bits. Default is 8. (See Funky features -> Chunk size for more detail)
 
 ## Examples
-``` cmprssr ./MyFile.txt ``` compresses MyFile.txt.
+``` cmprssr ./MyFile.txt -o ./myCompressed.cmp ``` compresses MyFile.txt and puts the data in myCompressed.cmp.
 
 ``` cmprssr -C 16 -c ./MyOtherFile.someExtention ``` compresses MyOtherFile.someExtention with a chunk size of 16 (which may compress slightly better)
 

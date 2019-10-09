@@ -13,7 +13,7 @@
 #include "./fileOutput.h"
 
 template<typename typeOfSize>
-void compress(std::string const file, int const chunkSize)
+void compress(std::string const file, int const chunkSize, char const * const outputFile = "./test.cmp")
 {
     auto str = fileToString(file.c_str());
 
@@ -34,27 +34,27 @@ void compress(std::string const file, int const chunkSize)
     auto compressedFinalDataString = mapVectorboolToString(compressedFinalData);
     outputFileData.insert(outputFileData.end(), compressedFinalDataString.begin(), compressedFinalDataString.end());
 
-    std::ofstream fileStream{"./test.cmp"};
+    std::ofstream fileStream{outputFile};
     fileStream << outputFileData;
 
     delete tree;
 }
 
 template<typename typeOfSize>
-void decompress(std::vector<bool> data)
+void decompress(std::vector<bool> data, char const * const outputFile = "./test.dcmp")
 {
     std::vector<bool>::const_iterator pData = data.begin() + 7;
 
     auto tree = HuffTree<typeOfSize>::deserialize(pData);
     auto decompressed = tree->decompressData(pData, data.end());
 
-    std::ofstream fileStream{"./test.dcmp"};
+    std::ofstream fileStream{outputFile};
     fileStream << decompressed;
 
     delete tree;
 }
 
-void decompress(std::string const file)
+void decompress(std::string const file, char const * const outputFile)
 {
     auto str = fileToString(file.c_str());
 
@@ -64,16 +64,16 @@ void decompress(std::string const file)
     {
         default:
         case 1:
-            decompress<unsigned char>(data);
+            decompress<unsigned char>(data, outputFile);
             break;
         case 2:
-            decompress<uint16_t>(data);
+            decompress<uint16_t>(data, outputFile);
             break;
         case 3:
-            decompress<uint32_t>(data);
+            decompress<uint32_t>(data, outputFile);
             break;
         case 4:
-            decompress<uint64_t>(data);
+            decompress<uint64_t>(data, outputFile);
             break;
     }
 }
@@ -85,9 +85,11 @@ int main(int argc, char** argv)
         compressFile,
         compressChunkSize,
         decompressFile,
+        outputFile,
     } argReadMode{compressFile};
 
     std::string file{};
+    char const * fileOutput{};
     int chunkSize{8};
     bool decompressing{false};
 
@@ -108,6 +110,9 @@ int main(int argc, char** argv)
                     argReadMode = decompressFile;
                     decompressing = true;
                     continue;
+                case 'o':
+                    argReadMode = outputFile;
+                    continue;
             }
         }
 
@@ -122,7 +127,11 @@ int main(int argc, char** argv)
             case decompressFile:
                 file = *arg;
                 break;
-            default:
+            case outputFile:
+                fileOutput = *arg;
+                break;
+            case none:
+                fprintf(stderr, "Warning: argument unused %s", *arg);
                 break;
         }
         argReadMode = none;
@@ -139,16 +148,16 @@ int main(int argc, char** argv)
         switch(chunkSize)
         {
             case 8:
-                compress<unsigned char>(file, chunkSize);
+                compress<unsigned char>(file, chunkSize, fileOutput);
                 break;
             case 16:
-                compress<uint16_t>(file, chunkSize);
+                compress<uint16_t>(file, chunkSize, fileOutput);
                 break;
             case 32:
-                compress<uint32_t>(file, chunkSize);
+                compress<uint32_t>(file, chunkSize, fileOutput);
                 break;
             case 64:
-                compress<uint64_t>(file, chunkSize);
+                compress<uint64_t>(file, chunkSize, fileOutput);
                 break;
 
             default:
@@ -157,7 +166,7 @@ int main(int argc, char** argv)
         }
     }
     else
-    {decompress(file);}
+    {decompress(file, fileOutput);}
 
     return 0;
 }
