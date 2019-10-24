@@ -13,24 +13,37 @@
 #include "./fileOutput.h"
 
 template<typename typeOfSize>
-void compress(std::string const file, int const chunkSize, char const * const outputFile = "./test.cmp")
-{
+void compress(
+    std::string const file, 
+    int const chunkSize, 
+    char const * const outputFile = "./test.cmp"
+){
+    //get file contents
     auto str = fileToString(file.c_str());
 
-    auto t = mapToTuples(
+    //make a tuple that relates data to it's frequency
+    auto dataFrequency = mapToTuples(
         countValues<typeOfSize>(str.c_str(), str.length())
     );
 
-    auto tree = HuffTree<typeOfSize>::init(t);
+    //use the frequencies to make the tree
+    auto tree = HuffTree<typeOfSize>::init(dataFrequency);
+    //and an easy way to convert from decompressed data to compressed
     auto treeMap = tree->getReverseMap();
 
+    //data to store the tree
+    //the rest of the data will be appended to it
     auto compressedFinalData = tree->serialize();
+    //data to store the file (compressed)
     auto compressedFileData = mapString(str.c_str(), str.length(), treeMap);
 
+    //append, as stated will happen above
     compressedFinalData.insert(compressedFinalData.end(), compressedFileData.begin(), compressedFileData.end());
 
     std::string outputFileData{};
+    //datum to tell the decompressor the chunk size
     outputFileData.push_back((char)(log2(chunkSize) - 2));
+    //put data into string to prepare it for the file
     auto compressedFinalDataString = mapVectorboolToString(compressedFinalData);
     outputFileData.insert(outputFileData.end(), compressedFinalDataString.begin(), compressedFinalDataString.end());
 
@@ -41,13 +54,22 @@ void compress(std::string const file, int const chunkSize, char const * const ou
 }
 
 template<typename typeOfSize>
-void decompress(std::vector<bool> data, char const * const outputFile = "./test.dcmp")
-{
+void decompress(
+    std::vector<bool> data, 
+    char const * const outputFile = "./test.dcmp"
+){
+    //get a bit-sized pointer to the data
+    //I tried using auto, but it initializes to bit_iterator
+    //I have no idea where the + 7 came from by the way
     std::vector<bool>::const_iterator pData = data.begin() + 7;
 
+    //pull the tree out of the file
+    //pData is mutated to just after the end of the tree data
     auto tree = HuffTree<typeOfSize>::deserialize(pData);
+    //data just after the tree must be the compressed file contents
     auto decompressed = tree->decompressData(pData, data.end());
 
+    //should be self explanatory
     std::ofstream fileStream{outputFile};
     fileStream << decompressed;
 
@@ -56,10 +78,11 @@ void decompress(std::vector<bool> data, char const * const outputFile = "./test.
 
 void decompress(std::string const file, char const * const outputFile)
 {
-    auto str = fileToString(file.c_str());
+    auto str = fileToString(file.c_str());  //get file contents
 
-    auto data = stringToVecBool(str.begin() + 1, str.end());
+    auto data = stringToVecBool(str.begin() + 1, str.end());    //convert file contents to binary string
 
+    //match chunk size to appropriate function and call it
     switch(str[0])
     {
         default:
@@ -80,7 +103,7 @@ void decompress(std::string const file, char const * const outputFile)
 
 int main(int argc, char** argv)
 {
-    enum {
+    enum { //A one use enum just to help with reading user arguments
         none,
         compressFile,
         compressChunkSize,
@@ -88,13 +111,16 @@ int main(int argc, char** argv)
         outputFile,
     } argReadMode{compressFile};
 
-    std::string file{};
-    char const * fileOutput{};
-    int chunkSize{8};
-    bool decompressing{false};
+    std::string file{};         //What file will be (de)compressed
+    char const * fileOutput{};  //What the output file will be called
+    int chunkSize{8};           //Size of chunks in bits (see README)
+    bool decompressing{false};  //Whether the file will be decompressed
 
+    //loop through the arguments
     for(auto arg = argv + 1; arg < argv + argc; arg++)
     {
+        //Check for hyphenated arg (like -d or -C)
+        //All results should continue to next arg
         if((*arg)[0] == '-')
         {
             switch((*arg)[1])
@@ -116,6 +142,7 @@ int main(int argc, char** argv)
             }
         }
 
+        //Set variables above based on arguments
         switch(argReadMode)
         {
             case compressFile:
@@ -137,12 +164,15 @@ int main(int argc, char** argv)
         argReadMode = none;
     }
 
+    //Checks whether the user gave a file at all.
     if(file.size() == 0)
     {
         printf("Needs a file to compress or decompress.\n");
         return 1;
     }
     
+    //Match chunk size to appropriate function and call it
+    //TODO: move to new function (or inline decompressing function)
     if(!decompressing)
     {
         switch(chunkSize)

@@ -8,7 +8,11 @@ template<typename T>
 std::map<T, unsigned int> countValues(void const * const str, size_t const strSize)
 {
     std::map<T, unsigned int> mapCount;
-    for(T const * p = (T*)str; p < (T*)((char*)str+strSize); p++)
+    for(
+        T const * p = (T*)str;
+        p < (T*)((char*)str+strSize);   //too many casts. basically currentIterator < endIteratorB
+        p++                             //jump foward sizeof(T)
+    )
     {mapCount[*p]++;}
 
     return mapCount;

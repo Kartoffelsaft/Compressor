@@ -9,6 +9,7 @@ std::vector<bool> mapString(char const * const str, size_t const strlen, std::ma
     std::vector<bool> out{};
     out.reserve(strlen); //it won't be longer than the input string. If it is, then what was the point of this whole endevour?
 
+    //very similar to countValues()
     for(T const * p = (T*)str; p < (T*)(str+strlen); p++)
     {
         auto v = map[*p];
@@ -21,18 +22,21 @@ std::vector<bool> mapString(char const * const str, size_t const strlen, std::ma
 std::string mapVectorboolToString(std::vector<bool> const vecBool)
 {
     std::string out{};
-    out.reserve((vecBool.size() - 1)/8 + 2);
+    out.reserve((vecBool.size() - 1)/8 + 1);
 
     char buffer{0};
 
     for(size_t i = 0; i < vecBool.size(); i++)
     {
         buffer += (bool)vecBool[i];
+        //every 8 iterations (bec. 8bit -> 1byte) 
+        //push buffer to output
         if(!(i%8))
         {out.push_back(buffer);}
         buffer <<= 1;
     }
 
+    //put 0's at end for padding
     buffer <<= 8 - vecBool.size() % 8;
     out.push_back(buffer);
 
