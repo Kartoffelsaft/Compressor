@@ -144,7 +144,6 @@ int main(int argc, char** argv)
     for(auto arg = argv + 1; arg < argv + argc; arg++)
     {
         //Check for hyphenated arg (like -d or -C)
-        //All results should continue to next arg
         if((*arg)[0] == '-')
         {
             switch((*arg)[1])
@@ -152,18 +151,23 @@ int main(int argc, char** argv)
                 case 'c':
                     argReadMode = compressFile;
                     decompressing = false;
-                    continue;
+                    break;
                 case 'C':
                     argReadMode = compressChunkSize;
-                    continue;
+                    break;
                 case 'd':
                     argReadMode = decompressFile;
                     decompressing = true;
-                    continue;
+                    break;
                 case 'o':
                     argReadMode = outputFile;
-                    continue;
+                    break;
+
+                default:
+                    printf("-%c is not a valid argument (see README for args)\n", (*arg)[1]);
+                    break;
             }
+            continue;
         }
 
         //Set variables above based on arguments
