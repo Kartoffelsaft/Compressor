@@ -52,6 +52,31 @@ void compress(
     delete tree;
 }
 
+void compress(
+    char const * const file,
+    char const * const fileOutput,
+    int const chunkSize
+){
+    switch(chunkSize)
+    {
+        case 8:
+            compress<unsigned char>(file, fileOutput);
+            break;
+        case 16:
+            compress<uint16_t>(file, fileOutput);
+            break;
+        case 32:
+            compress<uint32_t>(file, fileOutput);
+            break;
+        case 64:
+            compress<uint64_t>(file, fileOutput);
+            break;
+
+        default:
+            printf("A chunk size of %i is invalid. valid numbers are: 8, 16, 32, 64\n", chunkSize);
+    }
+}
+
 template<typename typeOfSize>
 void decompress(
     std::vector<bool> data, 
@@ -171,29 +196,8 @@ int main(int argc, char** argv)
     }
     
     //Match chunk size to appropriate function and call it
-    //TODO: move to new function (or inline decompressing function)
     if(!decompressing)
-    {
-        switch(chunkSize)
-        {
-            case 8:
-                compress<unsigned char>(file.c_str(), fileOutput);
-                break;
-            case 16:
-                compress<uint16_t>(file.c_str(), fileOutput);
-                break;
-            case 32:
-                compress<uint32_t>(file.c_str(), fileOutput);
-                break;
-            case 64:
-                compress<uint64_t>(file.c_str(), fileOutput);
-                break;
-
-            default:
-                printf("A chunk size of %i is invalid. valid numbers are: 8, 16, 32, 64\n", chunkSize);
-                return 2;
-        }
-    }
+    {compress(file.c_str(), fileOutput, chunkSize);}
     else
     {decompress(file.c_str(), fileOutput);}
 
