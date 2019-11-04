@@ -14,12 +14,11 @@
 
 template<typename typeOfSize>
 void compress(
-    std::string const file, 
-    int const chunkSize, 
+    char const * const file, 
     char const * const outputFile = "./test.cmp"
 ){
     //get file contents
-    auto str = fileToString(file.c_str());
+    auto str = fileToString(file);
 
     //make a tuple that relates data to it's frequency
     auto dataFrequency = mapToTuples(
@@ -42,7 +41,7 @@ void compress(
 
     std::string outputFileData{};
     //datum to tell the decompressor the chunk size
-    outputFileData.push_back((char)(log2(chunkSize) - 2));
+    outputFileData.push_back((char)(log2(sizeof(typeOfSize)) - 2));
     //put data into string to prepare it for the file
     auto compressedFinalDataString = mapVectorboolToString(compressedFinalData);
     outputFileData.insert(outputFileData.end(), compressedFinalDataString.begin(), compressedFinalDataString.end());
@@ -76,9 +75,9 @@ void decompress(
     delete tree;
 }
 
-void decompress(std::string const file, char const * const outputFile)
+void decompress(char const * const file, char const * const outputFile)
 {
-    auto str = fileToString(file.c_str());  //get file contents
+    auto str = fileToString(file);  //get file contents
 
     auto data = stringToVecBool(str.begin() + 1, str.end());    //convert file contents to binary string
 
@@ -178,16 +177,16 @@ int main(int argc, char** argv)
         switch(chunkSize)
         {
             case 8:
-                compress<unsigned char>(file, chunkSize, fileOutput);
+                compress<unsigned char>(file.c_str(), fileOutput);
                 break;
             case 16:
-                compress<uint16_t>(file, chunkSize, fileOutput);
+                compress<uint16_t>(file.c_str(), fileOutput);
                 break;
             case 32:
-                compress<uint32_t>(file, chunkSize, fileOutput);
+                compress<uint32_t>(file.c_str(), fileOutput);
                 break;
             case 64:
-                compress<uint64_t>(file, chunkSize, fileOutput);
+                compress<uint64_t>(file.c_str(), fileOutput);
                 break;
 
             default:
@@ -196,7 +195,7 @@ int main(int argc, char** argv)
         }
     }
     else
-    {decompress(file, fileOutput);}
+    {decompress(file.c_str(), fileOutput);}
 
     return 0;
 }
